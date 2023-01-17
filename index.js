@@ -30,6 +30,7 @@ const tempProduct = fs.readFileSync(
   "./templates/template-product.html",
   "utf-8"
 );
+const notFound = fs.readFileSync("./templates/not-found.html", "utf-8");
 
 const data = fs.readFileSync("./dev-data/data.json", "utf-8");
 const dataObj = JSON.parse(data);
@@ -72,9 +73,8 @@ const server = http.createServer((req, res) => {
     default:
       res.writeHead(404, {
         "Content-type": "text/html",
-        "my-own-header": "hello-world",
       });
-      res.end("<h1>Page not found!</h1>");
+      res.end(notFound);
   }
 });
 
