@@ -1,12 +1,8 @@
-const express = require("express");
-const app = express();
-const bodyParser = require("body-parser");
 const fs = require("fs");
 const http = require("http");
 const url = require("url");
 
-const hostName = "127.0.0.1";
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // SERVER
 const replaceTemplate = (temp, product) => {
@@ -38,59 +34,50 @@ const tempProduct = fs.readFileSync(
 const data = fs.readFileSync("./dev-data/data.json", "utf-8");
 const dataObj = JSON.parse(data);
 
-// const server = http.createServer((req, res) => {
-//   const { query, pathname } = url.parse(req.url, true);
-//   switch (pathname) {
-//     // Overview page
-//     case "/":
-//     case "/overview":
-//       res.writeHead(200, {
-//         "Content-type": "text/html",
-//       });
-//       const cardHTML = dataObj
-//         .map((el) => replaceTemplate(tempCard, el))
-//         .join("");
-//       const output = tempOverview.replace(/{%PRODUCT_CARDS%}/g, cardHTML);
-//       // console.log(cardHTML);
-//       res.end(output);
-//       break;
+const server = http.createServer((req, res) => {
+  const { query, pathname } = url.parse(req.url, true);
+  switch (pathname) {
+    // Overview page
+    case "/":
+    case "/overview":
+      res.writeHead(200, {
+        "Content-type": "text/html",
+      });
+      const cardHTML = dataObj
+        .map((el) => replaceTemplate(tempCard, el))
+        .join("");
+      const output = tempOverview.replace(/{%PRODUCT_CARDS%}/g, cardHTML);
+      // console.log(cardHTML);
+      res.end(output);
+      break;
 
-//     // Product page
-//     case "/product":
-//       {
-//         res.writeHead(404, { "Content-type": "text/html" });
-//         const product = dataObj[query.id];
-//         const output = replaceTemplate(tempProduct, product);
-//         res.end(output);
-//       }
-//       break;
-//     // API
-//     case "/api":
-//       res.writeHead(200, {
-//         "Content-type": "application/json",
-//       });
-//       console.log(data);
-//       res.end(data);
-//       break;
-//     // Not found
-//     default:
-//       res.writeHead(404, {
-//         "Content-type": "text/html",
-//         "my-own-header": "hello-world",
-//       });
-//       res.end("<h1>Page not found!</h1>");
-//   }
-// });
-
-// server.listen(port, hostName, () => {
-//   console.log(`Server running at http://${hostName}:${port}`);
-// });
-
-app.use(bodyParser.json());
-app.listen(port, hostName, () => {
-  console.log(`Server running at http://${hostName}:${port}`);
+    // Product page
+    case "/product":
+      {
+        res.writeHead(404, { "Content-type": "text/html" });
+        const product = dataObj[query.id];
+        const output = replaceTemplate(tempProduct, product);
+        res.end(output);
+      }
+      break;
+    // API
+    case "/api":
+      res.writeHead(200, {
+        "Content-type": "application/json",
+      });
+      console.log(data);
+      res.end(data);
+      break;
+    // Not found
+    default:
+      res.writeHead(404, {
+        "Content-type": "text/html",
+        "my-own-header": "hello-world",
+      });
+      res.end("<h1>Page not found!</h1>");
+  }
 });
 
-app.get("/", (req, res) => {
-  res.status(200).json({ message: "Completed" });
+server.listen(port, () => {
+  console.log(`Server running at ${port}`);
 });
